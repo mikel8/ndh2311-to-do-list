@@ -48,7 +48,12 @@
             <script type="text/javascript" src="lib/Bootstrap/bootstrap.min.js"></script>
             <script type="text/javascript" src="lib/jQuery/jquery.ui.min.js"></script>
             <script type="text/javascript" src="assets/todo.js"></script>
-
+            <script type="text/javascript">
+            // Toggle class 'toggle' when click on task-header in div id='container'
+            $("div#container").on('click','.task-header',function() {
+              $('.todo-task').toggleClass('toggle');
+            });
+            </script>
             <script type="text/javascript">
                 $( "#datepicker" ).datepicker();
                 $( "#datepicker" ).datepicker("option", "dateFormat", "dd/mm/yy");
