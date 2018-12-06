@@ -9,7 +9,7 @@ body {
 }
 
 .overdue {
-    background-color: #FFFF00;
+    background-color: #FFFF00 !important;
 }
 
 .toggle {

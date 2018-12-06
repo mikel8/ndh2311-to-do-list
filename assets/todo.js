@@ -9,32 +9,17 @@ All data is stored in local storage
 User data is extracted from local storage and saved in variable todo.data
 Otherwise, comments are provided at appropriate places
 */
-//Toggle
-$(document).ready(function(){
- $('.todo-task').on('click',function () {
-   $(this).toggleClass('toggle');
- });
-});
 
-//Highlight task
-$(document).ready(function(){
-  $('.add-task').on('click',function(){
-    $('.task-date').each(function(){
-      var a = new Date().dateFormat('dd/mm/yy').getTime();
-      var b = formatDate(b,'dd/mm/yy').getTime();
-      if(this.getTime() < b) {
-        return $('todo-task').addClass('overdue');
-      }
-    });
-  });
-});
+/* Saving Tasks in Local Storage: this application using HTML5’s local storage.
+In JavaScript, the variable localStorage stores all of this data. Each task would be stored within the data variable */
 var todo = todo || {},
     data = JSON.parse(localStorage.getItem("todoData"));
 
 data = data || {};
 
+// Defining the JavaScript Constants
 (function(todo, data, $) {
-
+// CSS selectors and attributes that would be used by the JavaScript functions
     var defaults = {
             todoTask: "todo-task",
             todoHeader: "task-header",
@@ -46,9 +31,9 @@ data = data || {};
             dataAttribute: "data",
             deleteDiv: "delete-div"
         }, codes = {
-            "1" : "#pending",
-            "2" : "#inProgress",
-            "3" : "#completed"
+            "1" : "#pending", // For pending tasks
+            "2" : "#inProgress", // For inProgress tasks
+            "3" : "#completed" // For completed tasks
         };
 
     todo.init = function (options) {
@@ -76,6 +61,8 @@ data = data || {};
             description: "Blah Blah"
         });*/
 
+        /* Implementing Drag and Drop: we need to add the droppable() function
+        to each of the categories as the elements are supposed to be dropped in any one of the three areas. */
         // Adding drop function to each category of task
         $.each(codes, function (index, value) {
             $(value).droppable({
@@ -104,7 +91,8 @@ data = data || {};
             });
         });
 
-        // Adding drop function to delete div
+    // Implementing Drag and Drop: we need to add some code to delete tasks when they are dropped in the delete area.
+    // Adding drop function to delete div
         $("#" + options.deleteDiv).droppable({
             drop: function(event, ui) {
                 var element = ui.helper,
@@ -123,10 +111,14 @@ data = data || {};
                 $("#" + defaults.deleteDiv).hide();
             }
         })
-
     };
 
+    //Current date.
+    var d = new Date();
+    var date = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear();
+    var overDueClass= "";
 
+      //Creating Tasks: Tasks are created using the following JavaScript function.
     // Add Task
     var generateElement = function(params){
         var parent = $(codes[params.code]),
@@ -135,32 +127,44 @@ data = data || {};
         if (!parent) {
             return;
         }
+
+    //  Check the to-do date is less than current date then add class overDueClass with value 'overdue' to class 'to-do-task' if not add class overDueClass with value "".
+        if(params.date < date) {
+        overDueClass= "overdue";
+      } else {
+        overDueClass="";
+      };
+
         wrapper = $("<div />", {
-            "class" : defaults.todoTask,
+            "class" : defaults.todoTask+" "+overDueClass, //Add class overDueClass
             "id" : defaults.taskId + params.id,
             "data" : params.id
         }).appendTo(parent);
 
         $("<div />", {
             "class" : defaults.todoHeader,
-            "text": params.title
+            "text": params.title,
         }).appendTo(wrapper);
 
         $("<div />", {
             "class" : defaults.todoDate,
-            "text": params.date
+            "text": params.date,
         }).appendTo(wrapper),
 
         $("<div />", {
             "class" : defaults.todoDescription,
             "text": params.description
         }).appendTo(wrapper),
-
+    // Add to-do owner to to-do task.
         $("<div />", {
             "class" : defaults.todoOwnner,
             "text": params.owner
         }).appendTo(wrapper)
 
+    /* Implementing Drag and Drop: we need to make each task draggable and each of the three categories droppable.
+    To delete a task, we need to hide the delete area by default, and show it during the time an item is being dragged.
+    Therefore, we first modify the generateElement() function to first make the to-do list items draggable,
+    and then make the delete area visible when the item is being drag. */
 	    wrapper.draggable({
             start: function() {
                 $("#" + defaults.deleteDiv).show();
@@ -174,11 +178,12 @@ data = data || {};
 
     };
 
-    // Remove task
+    // Deleting Tasks:
     var removeElement = function (params) {
         $("#" + defaults.taskId + params.id).remove();
     };
-
+    /* Submitting the To-Do Form: when the to-do form is submitted, a new task is created and added to local storage, and the contents of the page are updated.
+    The following function implements this functionality.*/
     todo.add = function() {
         var inputs = $("#" + defaults.formId + " :input"),
             errorMessage = "Title can not be empty",
@@ -253,6 +258,7 @@ data = data || {};
         });
     };
 
+    // Clear data storage
     todo.clear = function () {
         data = {};
         localStorage.setItem("todoData", JSON.stringify(data));
